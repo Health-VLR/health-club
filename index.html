@@ -1,0 +1,1600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health Club</title>
+    <link rel="icon" href="healthclub.jpg" type="image/png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            position: relative;
+        }
+
+        /* Timer Display */
+     .timer-display {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255, 255, 255, 0.95);
+    padding: 15px 25px;
+    border-radius: 50px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+    z-index: 999;
+    border: 3px solid #667eea;
+    display: none;
+}
+
+        .timer-display.show {
+            display: block;
+        }
+
+        .timer-display.warning {
+            background: rgba(255, 193, 7, 0.95);
+            border-color: #ffc107;
+            animation: pulse 1s infinite;
+        }
+
+        .timer-display.danger {
+            background: rgba(220, 53, 69, 0.95);
+            border-color: #dc3545;
+            color: white;
+            animation: flash 0.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.05); }
+        }
+
+        @keyframes flash {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        /* Login/User Info in corners - FIXED */
+        .top-right-login {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            font-size: 14px;
+            color: #333;
+            z-index: 1000;
+            display: none;
+            text-align: center;
+        }
+        
+        .top-left-login {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            font-size: 14px;
+            color: #333;
+            z-index: 1000;
+            display: none;
+            text-align: center;
+        }
+
+        .top-right-login.show {
+            display: block;
+        }
+        
+        .top-left-login.show {
+            display: block;
+        }
+
+        .logo {
+            height: 50px;
+            width: auto;
+            margin-bottom: 5px;
+            border-radius: 5px;
+        }
+
+        /* Copyright footer */
+        .copyright {
+            position: fixed;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            color: #333;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+
+        @media (max-width: 768px) {
+            .copyright {
+                font-size: 10px;
+                padding: 6px 12px;
+                bottom: 5px;
+            }
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 20px;
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+            animation: slideIn 0.8s ease-out;
+            margin: 10px;
+        }
+
+        /* Tablet and Desktop styles */
+        @media (min-width: 768px) {
+            .container {
+                padding: 40px;
+                margin: 20px;
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.2;
+        }
+
+        /* Responsive typography */
+        @media (min-width: 480px) {
+            h1 {
+                font-size: 2.2em;
+                margin-bottom: 25px;
+            }
+        }
+
+        @media (min-width: 768px) {
+            h1 {
+                font-size: 2.5em;
+                margin-bottom: 30px;
+            }
+        }
+
+        h2 {
+            color: #444;
+            margin-bottom: 20px;
+            font-size: 1.4em;
+            line-height: 1.3;
+        }
+
+        @media (min-width: 480px) {
+            h2 {
+                font-size: 1.6em;
+                margin-bottom: 25px;
+            }
+        }
+
+        @media (min-width: 768px) {
+            h2 {
+                font-size: 1.8em;
+            }
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        @media (min-width: 768px) {
+            .form-group {
+                margin-bottom: 20px;
+            }
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            color: #555;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        @media (min-width: 480px) {
+            label {
+                margin-bottom: 8px;
+                font-size: 15px;
+            }
+        }
+
+        input[type="text"], input[type="email"], input[type="tel"], select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background: white;
+        }
+
+        select {
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 20px;
+            padding-right: 40px;
+        }
+
+        input[type="text"]:focus, input[type="email"]:focus, input[type="tel"]:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.2);
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 8px;
+            min-width: 120px;
+            touch-action: manipulation;
+        }
+
+        @media (min-width: 480px) {
+            .btn {
+                padding: 14px 28px;
+                font-size: 15px;
+                margin: 10px;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .btn {
+                padding: 15px 30px;
+                font-size: 16px;
+            }
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .question {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        @media (min-width: 768px) {
+            .question {
+                padding: 20px;
+                margin-bottom: 20px;
+            }
+        }
+
+        .question h3 {
+            color: #333;
+            margin-bottom: 12px;
+            font-size: 1.1em;
+            line-height: 1.3;
+        }
+
+        @media (min-width: 480px) {
+            .question h3 {
+                font-size: 1.15em;
+                margin-bottom: 15px;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .question h3 {
+                font-size: 1.2em;
+            }
+        }
+
+        .question p {
+            font-size: 15px;
+            line-height: 1.4;
+            margin-bottom: 12px;
+        }
+
+        @media (min-width: 480px) {
+            .question p {
+                font-size: 16px;
+                margin-bottom: 15px;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .question p {
+                font-size: 17px;
+            }
+        }
+
+        .options {
+            display: grid;
+            gap: 8px;
+        }
+
+        @media (min-width: 768px) {
+            .options {
+                gap: 10px;
+            }
+        }
+
+        .option {
+            padding: 12px 15px;
+            background: white;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            line-height: 1.4;
+            word-wrap: break-word;
+            touch-action: manipulation;
+        }
+
+        @media (min-width: 480px) {
+            .option {
+                font-size: 15px;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .option {
+                font-size: 16px;
+            }
+        }
+
+        .option:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .option:active {
+            transform: scale(0.98);
+        }
+
+        .option.selected {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e1e5e9;
+            border-radius: 3px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+
+        @media (min-width: 768px) {
+            .progress-bar {
+                height: 8px;
+                border-radius: 4px;
+                margin-bottom: 20px;
+            }
+        }
+
+        .progress {
+            height: 100%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            transition: width 0.3s ease;
+            border-radius: inherit;
+        }
+
+        .riddle {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        @media (min-width: 768px) {
+            .riddle {
+                padding: 25px;
+                margin-bottom: 20px;
+            }
+        }
+
+        .riddle-text {
+            font-size: 16px;
+            font-style: italic;
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+
+        @media (min-width: 480px) {
+            .riddle-text {
+                font-size: 17px;
+                margin-bottom: 15px;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .riddle-text {
+                font-size: 18px;
+                line-height: 1.6;
+            }
+        }
+
+        .riddle input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ff9a9e;
+            border-radius: 8px;
+            font-size: 16px;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+
+        .score-display {
+            font-size: 1.2em;
+            margin: 15px 0;
+            padding: 15px;
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            border-radius: 15px;
+            color: #333;
+            line-height: 1.4;
+        }
+
+        @media (min-width: 480px) {
+            .score-display {
+                font-size: 1.3em;
+                margin: 18px 0;
+                padding: 18px;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .score-display {
+                font-size: 1.5em;
+                margin: 20px 0;
+                padding: 20px;
+            }
+        }
+
+        .score-display div {
+            margin-bottom: 8px;
+        }
+
+        .score-display div:last-child {
+            margin-bottom: 0;
+        }
+
+        .celebration {
+            animation: bounce 1s ease-in-out infinite alternate;
+        }
+
+        @keyframes bounce {
+            from { transform: translateY(0px); }
+            to { transform: translateY(-10px); }
+        }
+
+        .tobacco-icon {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+        }
+
+        @media (min-width: 480px) {
+            .tobacco-icon {
+                font-size: 2.8em;
+                margin-bottom: 18px;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .tobacco-icon {
+                font-size: 3em;
+                margin-bottom: 20px;
+            }
+        }
+
+        .error {
+            color: #e74c3c;
+            font-size: 13px;
+            margin-top: 5px;
+            line-height: 1.3;
+        }
+
+        @media (min-width: 480px) {
+            .error {
+                font-size: 14px;
+            }
+        }
+
+        .success {
+            color: #27ae60;
+            font-size: 13px;
+            margin-top: 5px;
+            line-height: 1.3;
+        }
+
+        @media (min-width: 480px) {
+            .success {
+                font-size: 14px;
+            }
+        }
+
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 8px;
+        }
+
+        @media (max-width: 600px) {
+            .quiz-container {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .loading {
+                width: 20px;
+                height: 20px;
+                border-width: 3px;
+                margin-left: 10px;
+            }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 480px) {
+            .course-title {
+                font-size: 22px;
+                padding: 12px 5px;
+            }
+            
+            .logo {
+                height: 40px;
+                margin: 5px 2px;
+            }
+            
+            .header-title {
+                font-size: 18px;
+            }
+            
+            .logo-container {
+                flex-direction: row;
+                justify-content: space-around;
+                gap: 0;
+            }
+            
+            .quiz-container {
+                grid-template-columns: 1fr;
+                gap: 15px;
+                padding: 5px 10px 20px;
+            }
+            
+            .quiz-circle {
+                width: 120px;
+                height: 120px;
+            }
+            
+            .quiz-title {
+                font-size: 16px;
+            }
+            
+            .exam-dates h3, .exam-info h3 {
+                font-size: 15px;
+            }
+            
+            .exam-dates p, .exam-info p {
+                font-size: 13px;
+            }
+        }
+
+        .final-message {
+            margin: 15px 0;
+            font-size: 16px;
+            color: #555;
+            line-height: 1.5;
+        }
+
+        @media (min-width: 480px) {
+            .final-message {
+                margin: 18px 0;
+                font-size: 17px;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .final-message {
+                margin: 20px 0;
+                font-size: 18px;
+                line-height: 1.6;
+            }
+        }
+
+        @media (max-width: 767px) {
+            .option {
+                min-height: 44px;
+                display: flex;
+                align-items: center;
+            }
+            
+            .btn {
+                min-height: 44px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 767px) and (orientation: landscape) {
+            body {
+                padding: 5px;
+            }
+            
+            .container {
+                padding: 15px;
+                margin: 5px;
+            }
+            
+            h1 {
+                font-size: 1.6em;
+                margin-bottom: 15px;
+            }
+            
+            h2 {
+                font-size: 1.3em;
+                margin-bottom: 15px;
+            }
+        }
+
+        @media (min-width: 1200px) {
+            .container {
+                max-width: 700px;
+                padding: 50px;
+            }
+        }
+
+        /* Time expired modal */
+        .time-expired-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            display: none;
+        }
+
+        .time-expired-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 400px;
+            margin: 20px;
+        }
+
+        .time-expired-content h2 {
+            color: #dc3545;
+            margin-bottom: 15px;
+        }
+
+        .riddle-error {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-22LD4DD8ES"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-22LD4DD8ES');
+    </script>
+
+    <!-- Timer Display -->
+    <div id="timerDisplay" class="timer-display">
+        <span id="timerText">⏰ 25:00</span>
+    </div>
+
+    <!-- Time Expired Modal -->
+    <div id="timeExpiredModal" class="time-expired-modal">
+        <div class="time-expired-content">
+            <h2>⏰ Time's Up!</h2>
+            <p>Your 25-minute session has expired. Your progress has been saved automatically.</p>
+            <button class="btn" onclick="handleTimeExpired()">OK</button>
+        </div>
+    </div>
+   
+     <!-- Top-left login info -->
+    <div id="topLeftLogin" class="top-left-login">
+        <img src="vit.jpg" alt="VIT Logo" class="logo">
+        <div id="userInfoLeft"></div>
+    </div>
+    
+    <!-- Top-right login info -->
+    <div id="topRightLogin" class="top-right-login">
+        <img src="healthclub.jpg" alt="Health Club Logo" class="logo">
+        <div id="userInfoRight"></div>
+    </div>
+
+    <!-- Copyright footer -->
+    <div class="copyright">
+        Copyright © 2025 Software Development,Vishva S A 23MIS0420,Gudiyattam 632-602.
+    </div>
+
+    <div class="container">
+        <!-- Login Page -->
+        <div id="loginPage" class="page active">
+            <div class="tobacco-icon">🏥</div>
+        
+            <h2>Educational Quiz</h2>
+            <form id="loginForm">
+            <div class="form-group">
+                <label for="name">Full Name:</label>
+                <input type="text" id="name" name="name" required>
+                <div class="error" id="nameError"></div>
+            </div>
+            <div class="form-group">
+                <label for="email">Email Address:</label>
+                <input type="email" id="email" name="email" required>
+                <div class="error" id="emailError"></div>
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone Number:</label>
+                <input type="tel" id="phone" name="phone" required>
+                <div class="error" id="phoneError"></div>
+            </div>
+            <div class="form-group">
+                <label for="registration">Registration Number:</label>
+                <input type="text" id="registration" name="registration" required>
+                <div class="error" id="registrationError"></div>
+            </div>
+            <div class="form-group">
+                <label for="belongs">Belongs To:</label>
+                <select id="belongs" name="belongs" required>
+                    <option value="">Select an option</option>
+                    <option value="fall-sem-exc-24-25">Fall sem EXC 24-25</option>
+                    <option value="winter-sem-exc-24-25">Winter sem EXC 24-25</option>
+                    <option value="junior-core">Junior Core</option>
+                    <option value="other">Other</option>
+                </select>
+                <div class="error" id="belongsError"></div>
+            </div>
+            <button type="submit" class="btn" id="submitBtn">Start Quiz</button>
+            <div id="statusMessage"></div>
+        </form>
+        </div>
+
+        <!-- Quiz Page -->
+        <div id="quizPage" class="page">
+            <h1>Quiz Challenge</h1>
+            <div class="progress-bar">
+                <div class="progress" id="progressBar"></div>
+            </div>
+            <div id="questionContainer"></div>
+            <button id="nextBtn" class="btn" style="display: none;">Next Question</button>
+            <button id="finishQuizBtn" class="btn" style="display: none;">Proceed to Riddles</button>
+        </div>
+
+        <!-- Riddle Page -->
+        <div id="riddlePage" class="page">
+            <h1>Riddle Challenge</h1>
+            <div class="progress-bar">
+                <div class="progress" id="riddleProgressBar"></div>
+            </div>
+            <div id="riddleContainer"></div>
+            <button id="submitRiddleBtn" class="btn" style="display: none;">Submit Answer</button>
+            <button id="nextRiddleBtn" class="btn" style="display: none;">Next Riddle</button>
+            <button id="finishRiddleBtn" class="btn" style="display: none;">Complete Challenge</button>
+        </div>
+
+        <!-- Final Page -->
+        <div id="finalPage" class="page">
+            <div class="celebration">🎉</div>
+            <h1>Congratulations!</h1>
+            <div class="score-display">
+                <div>Quiz Score: <span id="finalQuizScore"></span>/15</div>
+                <div>Riddle Score: <span id="finalRiddleScore"></span>/10</div>
+                <div><strong>Total Score: <span id="totalScore"></span>/25</strong></div>
+            </div>
+            <p class="final-message">
+                Thank you for participating in our World Food Safety Day educational challenge! 
+                Your awareness about food safety issues contributes to a healthier world.
+            </p>
+            <button class="btn" onclick="restartQuiz()">Take Quiz Again</button>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwk274pJi3YjkTVxzwqCYYKSFDgLnqLctVP83SRAPQLAHImq0nO67wge5WIxKJRAueR/exec';
+const TOTAL_TIME_MINUTES = 25;
+
+// Application State
+let currentUser = {};
+let currentQuizQuestion = 0;
+let currentRiddle = 0;
+let quizScore = 0;
+let riddleScore = 0;
+let quizAnswers = [];
+let riddleAnswers = [];
+let timerInterval = null;
+let timeRemaining = TOTAL_TIME_MINUTES * 60; // in seconds
+let quizStartTime = null;
+let isSubmitting = false; // Prevent multiple submissions
+
+// Quiz Questions Data
+const quizQuestions = [
+    {
+        question: "What is the main goal of World Food Safety Day?",
+        options: ["Celebrate culinary diversity", "Encourage food imports", "Raise awareness about food safety and encourage actions to prevent foodborne risks", "Promote fast food chains"],
+        correct: 2
+    },
+    {
+        question: "Why is food safety considered a shared responsibility?",
+        options: ["Only producers are responsible", "It involves everyone from producers to consumers", "Governments handle all aspects", "Only consumers are responsible"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is a key call to action for World Food Safety Day?",
+        options: ["Cook less to save energy", "Avoid scientific methods", "Ignore food labels", "Team up for food safety"],
+        correct: 3
+    },
+    {
+        question: "What is the theme for World Food Safety Day 2025?",
+        options: ["Food standards save lives", "Food safety: science in action", "Prepare for the unexpected", "Safer food, better health"],
+        correct: 1
+    },
+    {
+        question: "Which organizations jointly facilitate World Food Safety Day?",
+        options: ["FAO and WHO", "FAO and UNICEF", "UNESCO and WHO", "UNICEF and WTO"],
+        correct: 0
+    },
+    {
+        question: "Approximately how many people fall ill due to unsafe food each year?",
+        options: ["800 million", "600 million", "200 million", "400 million"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is NOT a key message of World Food Safety Day?",
+        options: ["Grow it safe", "Cook it fast", "Keep it safe", "Ensure it's safe"],
+        correct: 1
+    },
+    {
+        question: "What is the slogan for World Food Safety Day?",
+        options: ["Eat clean, stay healthy", "Food safety is everyone's business", "Safe food for all", "Global food, global safety"],
+        correct: 1
+    },
+    {
+        question: "What does \"World Food Safety Day\" emphasize?",
+        options: ["Scientific approaches to food safety", "Fast food consumption", "Organic farming only", "Traditional cooking methods"],
+        correct: 0
+    },
+    {
+        question: "Which group is most vulnerable to foodborne illnesses?",
+        options: ["Children under 5 and the elderly", "Teenagers", "Middle-aged adults", "Athletes"],
+        correct: 0
+    },
+    {
+        question: "What is a common cause of food contamination?",
+        options: ["Using clean utensils", "Cross-contamination", "Washing hands before cooking", "Proper refrigeration"],
+        correct: 1
+    },
+    {
+        question: "Which practice helps in preventing foodborne diseases?",
+        options: ["Washing hands before handling food", "Eating raw meat", "Leaving food at room temperature", "Using expired ingredients"],
+        correct: 0
+    },
+    {
+        question: "What temperature should refrigerators be maintained at?",
+        options: ["10°C or below", "4°C or below", "15°C or below", "Room temperature"],
+        correct: 1
+    },
+    {
+        question: "How long can cooked food be safely left at room temperature?",
+        options: ["4 hours", "6 hours", "2 hours", "8 hours"],
+        correct: 2
+    },
+    {
+        question: "Which of the following is a sign of food spoilage?",
+        options: ["Pleasant aroma", "Bright colors", "Unusual smell or appearance", "Firm texture"],
+        correct: 2
+    }
+];
+
+// Riddle Questions Data
+const riddles = [
+    {
+        question: "I protect your food from harmful bacteria, but I'm not a medicine. I'm cold and keep things fresh. What am I?",
+        answer: "refrigerator",
+        alternatives: ["fridge", "freezer", "icebox"]
+    },
+    {
+        question: "I clean your hands before you cook, I'm bubbly and white. Without me, germs might make you sick. What am I?",
+        answer: "soap",
+        alternatives: ["handwash", "detergent", "cleanser"]
+    },
+    {
+        question: "I'm a number that tells you if food is safe to eat. I'm usually found on packages. What am I?",
+        answer: "expiry date",
+        alternatives: ["expiration date", "best before date", "use by date", "date"]
+    },
+    {
+        question: "I'm hot enough to kill germs in your food. I make raw things safe to eat. What am I?",
+        answer: "cooking",
+        alternatives: ["heat", "boiling", "fire", "temperature"]
+    },
+    {
+        question: "I separate raw meat from other foods. I prevent cross-contamination. What am I?",
+        answer: "cutting board",
+        alternatives: ["chopping board", "separate board", "board"]
+    },
+    {
+        question: "I'm measured in degrees and tell you if food is cooked safely. What am I?",
+        answer: "temperature",
+        alternatives: ["heat", "thermometer", "cooking temperature"]
+    },
+    {
+        question: "I'm a tiny organism that can make you sick if I'm in your food. You can't see me without a microscope. What am I?",
+        answer: "bacteria",
+        alternatives: ["germs", "microbe", "virus", "pathogen"]
+    },
+    {
+        question: "I'm the practice of keeping raw and cooked foods apart. I prevent contamination. What am I?",
+        answer: "separation",
+        alternatives: ["cross contamination prevention", "food separation", "keeping apart"]
+    },
+    {
+        question: "I'm the first thing you should do before handling food. I involve water and soap. What am I?",
+        answer: "washing hands",
+        alternatives: ["hand washing", "clean hands", "wash hands", "handwashing"]
+    },
+    {
+        question: "I'm a global event that happens every June 7th to raise awareness about food safety. What am I?",
+        answer: "world food safety day",
+        alternatives: ["food safety day", "world food day", "food safety awareness day"]
+    }
+];
+
+// Timer Functions
+function startTimer() {
+    quizStartTime = Date.now();
+    updateTimerDisplay();
+    
+    timerInterval = setInterval(() => {
+        timeRemaining--;
+        updateTimerDisplay();
+        
+        if (timeRemaining <= 0) {
+            handleTimeExpired();
+        }
+    }, 1000);
+}
+
+function updateTimerDisplay() {
+    const minutes = Math.floor(timeRemaining / 60);
+    const seconds = timeRemaining % 60;
+    const timeString = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    
+    const timerDisplay = document.getElementById('timerDisplay');
+    const timerText = document.getElementById('timerText');
+    
+    if (timerDisplay && timerText) {
+        timerText.textContent = `⏰ ${timeString}`;
+        
+        // Show timer and add warning/danger classes
+        if (timeRemaining > 0) {
+            timerDisplay.classList.add('show');
+            
+            if (timeRemaining <= 60) { // Last minute
+                timerDisplay.classList.add('danger');
+                timerDisplay.classList.remove('warning');
+            } else if (timeRemaining <= 300) { // Last 5 minutes
+                timerDisplay.classList.add('warning');
+                timerDisplay.classList.remove('danger');
+            } else {
+                timerDisplay.classList.remove('warning', 'danger');
+            }
+        }
+    }
+}
+
+function handleTimeExpired() {
+    clearInterval(timerInterval);
+    const timeExpiredModal = document.getElementById('timeExpiredModal');
+    if (timeExpiredModal) {
+        timeExpiredModal.style.display = 'flex';
+    }
+    
+    // Auto-submit current answers and finish
+    submitFinalAnswers();
+}
+
+// Login Functions
+function validateForm() {
+    const name = document.getElementById('name');
+    const email = document.getElementById('email');
+    const phone = document.getElementById('phone');
+    const registration = document.getElementById('registration');
+    const belongs = document.getElementById('belongs');
+
+    if (!name || !email || !phone || !registration || !belongs) {
+        console.error('Form elements not found');
+        return false;
+    }
+
+    const nameValue = name.value.trim();
+    const emailValue = email.value.trim();
+    const phoneValue = phone.value.trim();
+    const registrationValue = registration.value.trim();
+    const belongsValue = belongs.value;
+
+    clearErrors();
+
+    let isValid = true;
+
+    if (!nameValue) {
+        showError('nameError', 'Name is required');
+        isValid = false;
+    }
+
+    if (!emailValue || !isValidEmail(emailValue)) {
+        showError('emailError', 'Please enter a valid email address');
+        isValid = false;
+    }
+
+    if (!phoneValue || !isValidPhone(phoneValue)) {
+        showError('phoneError', 'Please enter a valid phone number');
+        isValid = false;
+    }
+
+    if (!registrationValue) {
+        showError('registrationError', 'Registration number is required');
+        isValid = false;
+    }
+
+    if (!belongsValue) {
+        showError('belongsError', 'Please select your group');
+        isValid = false;
+    }
+
+    return isValid;
+}
+
+function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+function isValidPhone(phone) {
+    return /^\d{10}$/.test(phone.replace(/\D/g, ''));
+}
+
+function showError(elementId, message) {
+    const errorElement = document.getElementById(elementId);
+    if (errorElement) {
+        errorElement.textContent = message;
+    }
+}
+
+function clearErrors() {
+    const errorElements = document.querySelectorAll('.error');
+    errorElements.forEach(element => element.textContent = '');
+}
+
+// Quiz Functions
+function startQuiz() {
+    const nameElement = document.getElementById('name');
+    const emailElement = document.getElementById('email');
+    const phoneElement = document.getElementById('phone');
+    const registrationElement = document.getElementById('registration');
+    const belongsElement = document.getElementById('belongs');
+
+    if (!nameElement || !emailElement || !phoneElement || !registrationElement || !belongsElement) {
+        alert('Form elements not found. Please refresh the page.');
+        return;
+    }
+
+    currentUser = {
+        name: nameElement.value.trim(),
+        email: emailElement.value.trim(),
+        phone: phoneElement.value.trim(),
+        registration: registrationElement.value.trim(),
+        belongs: belongsElement.value
+    };
+
+    // Show user info in corners
+    const userInfoLeft = document.getElementById('userInfoLeft');
+    const userInfoRight = document.getElementById('userInfoRight');
+    const topLeftLogin = document.getElementById('topLeftLogin');
+    const topRightLogin = document.getElementById('topRightLogin');
+
+    if (userInfoLeft) {
+        userInfoLeft.innerHTML = `<strong>${currentUser.name}</strong><br>${currentUser.registration}`;
+    }
+    if (userInfoRight) {
+        userInfoRight.innerHTML = `<strong>${currentUser.belongs}</strong><br>Quiz in Progress`;
+    }
+    if (topLeftLogin) {
+        topLeftLogin.classList.add('show');
+    }
+    if (topRightLogin) {
+        topRightLogin.classList.add('show');
+    }
+
+    const loginPage = document.getElementById('loginPage');
+    const quizPage = document.getElementById('quizPage');
+
+    if (loginPage) loginPage.classList.remove('active');
+    if (quizPage) quizPage.classList.add('active');
+    
+    startTimer();
+    showQuestion();
+}
+
+function showQuestion() {
+    if (currentQuizQuestion >= quizQuestions.length) {
+        finishQuiz();
+        return;
+    }
+
+    const question = quizQuestions[currentQuizQuestion];
+    const container = document.getElementById('questionContainer');
+    
+    if (!container) {
+        console.error('Question container not found');
+        return;
+    }
+    
+    container.innerHTML = `
+        <div class="question">
+            <h3>Question ${currentQuizQuestion + 1} of ${quizQuestions.length}</h3>
+            <p>${question.question}</p>
+            <div class="options">
+                ${question.options.map((option, index) => 
+                    `<div class="option" onclick="selectAnswer(${index})">${option}</div>`
+                ).join('')}
+            </div>
+        </div>
+    `;
+
+    updateQuizProgress();
+    
+    const nextBtn = document.getElementById('nextBtn');
+    const finishQuizBtn = document.getElementById('finishQuizBtn');
+    
+    if (nextBtn) nextBtn.style.display = 'block';
+    if (finishQuizBtn) {
+        finishQuizBtn.style.display = currentQuizQuestion === quizQuestions.length - 1 ? 'block' : 'none';
+    }
+}
+
+function selectAnswer(selectedIndex) {
+    const options = document.querySelectorAll('.option');
+    options.forEach(option => option.classList.remove('selected'));
+    if (options[selectedIndex]) {
+        options[selectedIndex].classList.add('selected');
+    }
+    
+    // Store answer (always move to next regardless of correctness)
+    quizAnswers[currentQuizQuestion] = selectedIndex;
+    
+    // Check if correct for scoring
+    if (selectedIndex === quizQuestions[currentQuizQuestion].correct) {
+        quizScore++;
+    }
+}
+
+function nextQuestion() {
+    // If no answer selected, store -1 (unanswered)
+    if (quizAnswers[currentQuizQuestion] === undefined) {
+        quizAnswers[currentQuizQuestion] = -1;
+    }
+    
+    currentQuizQuestion++;
+    showQuestion();
+}
+
+function updateQuizProgress() {
+    const progressBar = document.getElementById('progressBar');
+    if (progressBar) {
+        const progress = ((currentQuizQuestion + 1) / quizQuestions.length) * 100;
+        progressBar.style.width = progress + '%';
+    }
+}
+
+function finishQuiz() {
+    const quizPage = document.getElementById('quizPage');
+    const riddlePage = document.getElementById('riddlePage');
+    const userInfoRight = document.getElementById('userInfoRight');
+
+    if (quizPage) quizPage.classList.remove('active');
+    if (riddlePage) riddlePage.classList.add('active');
+    
+    // Update user info
+    if (userInfoRight) {
+        userInfoRight.innerHTML = `<strong>${currentUser.belongs}</strong><br>Riddles in Progress`;
+    }
+    
+    showRiddle();
+}
+
+// Riddle Functions
+function showRiddle() {
+    if (currentRiddle >= riddles.length) {
+        finishRiddles();
+        return;
+    }
+
+    const riddle = riddles[currentRiddle];
+    const container = document.getElementById('riddleContainer');
+    
+    if (!container) {
+        console.error('Riddle container not found');
+        return;
+    }
+    
+    container.innerHTML = `
+        <div class="riddle">
+            <h3>Riddle ${currentRiddle + 1} of ${riddles.length}</h3>
+            <p class="riddle-text">${riddle.question}</p>
+            <input type="text" id="riddleAnswer" placeholder="Type your answer here..." />
+            <div class="riddle-error" id="riddleError"></div>
+        </div>
+    `;
+
+    updateRiddleProgress();
+    
+    const submitRiddleBtn = document.getElementById('submitRiddleBtn');
+    const nextRiddleBtn = document.getElementById('nextRiddleBtn');
+    const finishRiddleBtn = document.getElementById('finishRiddleBtn');
+    
+    if (submitRiddleBtn) submitRiddleBtn.style.display = 'block';
+    if (nextRiddleBtn) nextRiddleBtn.style.display = 'none';
+    if (finishRiddleBtn) finishRiddleBtn.style.display = 'none';
+}
+
+function submitRiddle() {
+    const riddleAnswerInput = document.getElementById('riddleAnswer');
+    if (!riddleAnswerInput) {
+        console.error('Riddle answer input not found');
+        return;
+    }
+
+    const answer = riddleAnswerInput.value.trim().toLowerCase();
+    const riddle = riddles[currentRiddle];
+    
+    // Always allow moving to next riddle
+    riddleAnswers[currentRiddle] = answer;
+    
+    // Check if answer is correct for scoring
+    const isCorrect = answer === riddle.answer.toLowerCase() || 
+                     riddle.alternatives.some(alt => alt.toLowerCase() === answer);
+    
+    if (isCorrect) {
+        riddleScore++;
+    }
+    
+    // Show next/finish button
+    const submitRiddleBtn = document.getElementById('submitRiddleBtn');
+    const nextRiddleBtn = document.getElementById('nextRiddleBtn');
+    const finishRiddleBtn = document.getElementById('finishRiddleBtn');
+    
+    if (submitRiddleBtn) submitRiddleBtn.style.display = 'none';
+    if (nextRiddleBtn) nextRiddleBtn.style.display = currentRiddle < riddles.length - 1 ? 'block' : 'none';
+    if (finishRiddleBtn) finishRiddleBtn.style.display = currentRiddle === riddles.length - 1 ? 'block' : 'none';
+}
+
+function nextRiddle() {
+    currentRiddle++;
+    showRiddle();
+}
+
+function updateRiddleProgress() {
+    const riddleProgressBar = document.getElementById('riddleProgressBar');
+    if (riddleProgressBar) {
+        const progress = ((currentRiddle + 1) / riddles.length) * 100;
+        riddleProgressBar.style.width = progress + '%';
+    }
+}
+
+function finishRiddles() {
+    if (timerInterval) {
+        clearInterval(timerInterval);
+    }
+    
+    const timerDisplay = document.getElementById('timerDisplay');
+    if (timerDisplay) {
+        timerDisplay.classList.remove('show');
+    }
+    
+    const riddlePage = document.getElementById('riddlePage');
+    const finalPage = document.getElementById('finalPage');
+    const userInfoRight = document.getElementById('userInfoRight');
+
+    if (riddlePage) riddlePage.classList.remove('active');
+    if (finalPage) finalPage.classList.add('active');
+    
+    // Update user info
+    if (userInfoRight) {
+        userInfoRight.innerHTML = `<strong>${currentUser.belongs}</strong><br>Challenge Complete!`;
+    }
+    
+    showFinalScore();
+    submitFinalAnswers();
+}
+
+function showFinalScore() {
+    const finalQuizScore = document.getElementById('finalQuizScore');
+    const finalRiddleScore = document.getElementById('finalRiddleScore');
+    const totalScore = document.getElementById('totalScore');
+
+    if (finalQuizScore) finalQuizScore.textContent = quizScore;
+    if (finalRiddleScore) finalRiddleScore.textContent = riddleScore;
+    if (totalScore) totalScore.textContent = quizScore + riddleScore;
+}
+
+// Data Submission
+async function submitFinalAnswers() {
+    if (isSubmitting) {
+        console.log('Already submitting, skipping...');
+        return;
+    }
+    
+    isSubmitting = true;
+    
+    try {
+        const endTime = Date.now();
+        const timeSpent = quizStartTime ? Math.round((endTime - quizStartTime) / 1000) : 0;
+        
+        const data = {
+            timestamp: new Date().toISOString(),
+            name: currentUser.name || '',
+            email: currentUser.email || '',
+            phone: currentUser.phone || '',
+            registration: currentUser.registration || '',
+            belongs: currentUser.belongs || '',
+            quizScore: quizScore,
+            riddleScore: riddleScore,
+            totalScore: quizScore + riddleScore,
+            timeSpent: timeSpent,
+            quizAnswers: JSON.stringify(quizAnswers),
+            riddleAnswers: JSON.stringify(riddleAnswers)
+        };
+
+        console.log('Submitting data:', data);
+
+        const response = await fetch(GOOGLE_SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify(data),
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            mode: 'no-cors' // Add this for Google Apps Script
+        });
+
+        console.log('Data submitted successfully');
+        
+        // Since we're using no-cors, we can't read the response
+        // But we can assume success if no error was thrown
+        
+    } catch (error) {
+        console.error('Error submitting data:', error);
+        
+        // Try alternative submission method
+        try {
+            const fallbackData = new FormData();
+            fallbackData.append('data', JSON.stringify({
+                timestamp: new Date().toISOString(),
+                name: currentUser.name || '',
+                email: currentUser.email || '',
+                phone: currentUser.phone || '',
+                registration: currentUser.registration || '',
+                belongs: currentUser.belongs || '',
+                quizScore: quizScore,
+                riddleScore: riddleScore,
+                totalScore: quizScore + riddleScore,
+                quizAnswers: JSON.stringify(quizAnswers),
+                riddleAnswers: JSON.stringify(riddleAnswers)
+            }));
+
+            await fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                body: fallbackData,
+                mode: 'no-cors'
+            });
+
+            console.log('Fallback submission successful');
+        } catch (fallbackError) {
+            console.error('Fallback submission also failed:', fallbackError);
+        }
+    } finally {
+        isSubmitting = false;
+    }
+}
+
+function restartQuiz() {
+    // Reset all variables
+    currentUser = {};
+    currentQuizQuestion = 0;
+    currentRiddle = 0;
+    quizScore = 0;
+    riddleScore = 0;
+    quizAnswers = [];
+    riddleAnswers = [];
+    timeRemaining = TOTAL_TIME_MINUTES * 60;
+    quizStartTime = null;
+    isSubmitting = false;
+    
+    // Clear timer
+    if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+    }
+    
+    // Hide user info
+    const topLeftLogin = document.getElementById('topLeftLogin');
+    const topRightLogin = document.getElementById('topRightLogin');
+    const timerDisplay = document.getElementById('timerDisplay');
+    
+    if (topLeftLogin) topLeftLogin.classList.remove('show');
+    if (topRightLogin) topRightLogin.classList.remove('show');
+    if (timerDisplay) timerDisplay.classList.remove('show');
+    
+    // Reset form
+    const loginForm = document.getElementById('loginForm');
+    if (loginForm) {
+        loginForm.reset();
+    }
+    clearErrors();
+    
+    // Show login page
+    const finalPage = document.getElementById('finalPage');
+    const loginPage = document.getElementById('loginPage');
+    
+    if (finalPage) finalPage.classList.remove('active');
+    if (loginPage) loginPage.classList.add('active');
+}
+
+// Event Listeners - Wait for DOM to load
+document.addEventListener('DOMContentLoaded', function() {
+    // Login form submission
+    const loginForm = document.getElementById('loginForm');
+    if (loginForm) {
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (validateForm()) {
+                startQuiz();
+            }
+        });
+    }
+
+    // Quiz navigation buttons
+    const nextBtn = document.getElementById('nextBtn');
+    const finishQuizBtn = document.getElementById('finishQuizBtn');
+    const submitRiddleBtn = document.getElementById('submitRiddleBtn');
+    const nextRiddleBtn = document.getElementById('nextRiddleBtn');
+    const finishRiddleBtn = document.getElementById('finishRiddleBtn');
+
+    if (nextBtn) nextBtn.addEventListener('click', nextQuestion);
+    if (finishQuizBtn) finishQuizBtn.addEventListener('click', finishQuiz);
+    if (submitRiddleBtn) submitRiddleBtn.addEventListener('click', submitRiddle);
+    if (nextRiddleBtn) nextRiddleBtn.addEventListener('click', nextRiddle);
+    if (finishRiddleBtn) finishRiddleBtn.addEventListener('click', finishRiddles);
+
+    // Handle Enter key for riddle input
+    document.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            const riddlePage = document.getElementById('riddlePage');
+            if (riddlePage && riddlePage.classList.contains('active')) {
+                const submitBtn = document.getElementById('submitRiddleBtn');
+                const nextBtn = document.getElementById('nextRiddleBtn');
+                const finishBtn = document.getElementById('finishRiddleBtn');
+                
+                if (submitBtn && submitBtn.style.display !== 'none') {
+                    submitRiddle();
+                } else if (nextBtn && nextBtn.style.display !== 'none') {
+                    nextRiddle();
+                } else if (finishBtn && finishBtn.style.display !== 'none') {
+                    finishRiddles();
+                }
+            }
+        }
+    });
+});
+
+// Global functions for time expired modal
+window.handleTimeExpired = function() {
+    const timeExpiredModal = document.getElementById('timeExpiredModal');
+    if (timeExpiredModal) {
+        timeExpiredModal.style.display = 'none';
+    }
+    finishRiddles();
+};
+
+// Global function for restart (if called from HTML)
+window.restartQuiz = restartQuiz;
+    </script>
+</body>
+</html>    
